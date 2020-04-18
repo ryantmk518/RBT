@@ -18,11 +18,14 @@ class Node{
   Node* getLeft();
   int getColor();
   void setColor(int);
+  Node* getParent();
+  void setParent(Node*);
  private:
   int color;
   int value;
   Node* right;
   Node* left;
+  Node* parent;
 };
 
 #endif

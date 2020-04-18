@@ -47,3 +47,11 @@ void Node::setColor(int newColor) {
 int Node::getColor() {
   return color;
 }
+
+Node* Node::getParent() {
+  return parent;
+}
+
+void Node::setParent(Node* newNode) {
+  parent = newNode;
+}
