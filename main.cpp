@@ -19,6 +19,10 @@ Node* getParent(Node* head, Node* node);
 Node* getUncle(Node* head, Node* node);
 Node* getGrand(Node* head, Node* node);
 Node* getSibling(Node* head, Node* node);
+void Case1(Node* head, Node* node);
+void Case2(Node* head, Node* node);
+void Case3(Node* head, Node* node);
+void Case4(Node* head, Node* node);
 
 int main(){
   bool quit = false;
@@ -110,6 +114,33 @@ int main(){
   }
 }
 
+void Case1(Node* head, Node* node) {
+  node->setColor(1);
+}
+
+void Case2(Node* head, Node* node) {
+  return;
+}
+
+void Case3(Node* head, Node* node) {
+  getParent(head, node) ->setColor(1);
+  getUncle(head, node) ->setColor(1);
+  getGrand(head, node) ->setColor(0);
+  fixColor(head, getGrand(head, node));
+}
+
+void Case4(Node* head, Node* node) {
+  if (getParent(head, node) -> getRight() == node && getGrand(head, node)->getRight() == getParent(head, node)) {
+    rotateLeft(getParent(head, node));
+    node = node->getLeft();
+  }
+  else if (getParent(head, node) -> getLeft() == node && getGrand(head, node)->getLeft() == getParent(head, node)) {
+    rotateRight(getParent(head, node));
+    node = node->getRight();
+  }
+
+}
+
 void remove(Node* head, Node* first, int num) {
   if (head == NULL) { //If tree doesn't exist
     return;
@@ -172,46 +203,20 @@ void remove(Node* head, Node* first, int num) {
 }
 
 void fixColor(Node* head, Node* node) {
-  cout << "Fixing color" << endl;
-  if (head == node) {
-    cout << "Head is node" << endl;
-    return;
+  if (getParent(head, node) == NULL) {
+    Case1(node);
   }
-  else if (getParent(head, node)->getColor() == 1) {
-    cout << "Parent is black (which is good)" << endl;
+  else if (getParent(head, node) ->getColor() == 1) {
+    Case2(node);
   }
-  else if (getParent(head, node) != NULL && getUncle(head, node) != NULL) {
-    cout << "Has parent, has uncle" << endl;
-    if (getParent(head, node)->getColor() == 0 && getUncle(head, node) ->getColor() == 0) {
-      cout << "Parent and Uncle Red" << endl;
-      cout << "Setting " << getParent(head, node) -> getValue() << " to black" << endl;
-      getParent(head, node) -> setColor(1);
-      cout << "Setting " << getUncle(head, node) -> getValue() << " to black" << endl;
-      cout << getUncle(head, node) -> getValue() << endl;
-      getUncle(head, node) -> setColor(1);
-      cout << "Setting " << getGrand(head, node) -> getValue() << " to black" << endl;
-      getGrand(head, node) -> setColor(0);
-      fixColor(head, getGrand(head, node));
-    }
-    else if (getUncle(head, node)-> getColor() == 1) {
-      if (getGrand(head, node)->getLeft() == getParent(head, node) && getParent(head, node) -> getRight() == node) { 
-        cout << "Case 4" << endl;
-      }
-      else if (getGrand(head, node)->getRight() == getParent(head, node) && getParent(head, node) ->getLeft() == node) {
-        cout << "Case 4 2" << endl;
-      }
-      else if (getGrand(head, node)->getRight() == getParent(head, node) && getParent(head, node) -> getRight() == node) {
-        cout << "Case 5" << endl;
-      }
-      else if (getGrand(head, node)->getLeft() == getParent(head, node) && getParent(head, node) -> getLeft() == node) {
-        cout << "Case 5" << endl;
-      }
-    }
+  else if (getUncle(head, node) != NULL && getUncle(head, node) -> getColor() == 0) {
+    Case3(node);
   }
   else {
-    cout << "Ayaya" << endl;
+    Case4(node);
   }
 }
+
 
 Node* getParent(Node* head, Node* node) {
   if (head->getLeft() == node || head->getRight() == node) {
@@ -318,7 +323,7 @@ void add(Node* head, Node* parent, int value, int first) {
       else { // New node
         Node* newNode = new Node(value);
         parent->setLeft(newNode);
-        //fixColor(head, newNode);
+        fixColor(head, newNode);
       }
     }
   }
