@@ -5,7 +5,7 @@
 #include <fstream>
 #include "stdlib.h"
 
-//Ryan Thammakhoune Binary Search Tree. Add integers to a binary tree. Can check if int is in tree. Can remove int from tree. Type Console to keep adding integers to the tree.
+//Ryan Thammakhoune Red Black Tree. Add integers to a binary tree. Assigns red or black to each node. The number of black nodes in each path is the same.
 
 using namespace std;
 
@@ -26,12 +26,13 @@ void Case4(Node* head, Node* node);
 void rotateRight(Node* head, Node* node);
 void rotateLeft(Node* head, Node* node);
 void addFix(Node* head, Node* node);
+void Case5(Node* head, Node* node);
 
 int main(){
   bool quit = false;
   Node* head = NULL; //Head node
   while (quit == false) {
-    cout << "Enter Console, File, Search, Remove, or Quit" << endl;
+    cout << "Enter Console, File, or Quit" << endl;
     char input[99];
     cin.getline(input, 99);
     if (strcmp(input, "Console") == 0) { //Enter through console
@@ -82,10 +83,12 @@ int main(){
         split = strtok(NULL, " ");
         ++a;
       }
-      for (int i = 0; i < a; i++) {
+      cout << "adding" << endl;
+      for(int i = 0; i < a; i++) {
         Node* newNode = new Node(array[i]);
         head = add(head, newNode);
       }
+      cout << "Done" << endl;
       print(head, 0);
       cout << "\n";
     }
@@ -118,7 +121,7 @@ int main(){
   }
 }
 
-void rotateLeft(Node* head, Node* node) {
+void rotateLeft(Node* head, Node* node) { //Rotate left for case 4
   Node* newNode = node->getRight();
   node->setRight(newNode->getLeft());
   newNode->setLeft(node);
@@ -137,7 +140,7 @@ void rotateLeft(Node* head, Node* node) {
   newNode->setParent(getParent(head, node));
 }
 
-void rotateRight(Node* head, Node* node) {
+void rotateRight(Node* head, Node* node) { //Rotate tree right for case 4
   Node* newNode = node->getLeft();
   node->setLeft(newNode->getRight());
   newNode->setRight(node);
@@ -181,6 +184,10 @@ void Case4(Node* head, Node* node) {
     rotateRight(head, getParent(head, node));
     node = node->getRight();
   }
+  Case5(head, node);
+}
+
+void Case5(Node* head, Node* node) {
   if (getParent(head, node) -> getLeft() == node) {
     rotateRight(head, getGrand(head, node));
   }
@@ -191,7 +198,7 @@ void Case4(Node* head, Node* node) {
   getGrand(head, node) -> setColor(0);
 }
 
-void remove(Node* head, Node* first, int num) {
+void remove(Node* head, Node* first, int num) { //Not needed
   if (head == NULL) { //If tree doesn't exist
     return;
   }
@@ -253,28 +260,26 @@ void remove(Node* head, Node* first, int num) {
 }
 
 void fixColor(Node* head, Node* node) {
-  cout << "Fix color" << endl;
-  if (node->getParent() == NULL) {
-    cout << "Parent is null" << endl;
+  if (node->getParent() == NULL) { //If parent is null
     Case1(head, node);
   }
-  else if (node->getParent() ->getColor() == 1) {
+  else if (node->getParent() ->getColor() == 1) { //If parent is black
     Case2(head, node);
   }
-  else if (getUncle(head, node) != NULL && getUncle(head, node) -> getColor() == 0) {
+  else if (getUncle(head, node) != NULL && getUncle(head, node) -> getColor() == 0) { //If uncle red
     Case3(head, node);
   }
-  else {
+  else { //All other cases
     Case4(head, node);
   }
 }
 
 
-Node* getParent(Node* head, Node* node) {
+Node* getParent(Node* head, Node* node) { //Return parent
   return node->getParent();
 }
 
-Node* getSibling(Node* head, Node* node) {
+Node* getSibling(Node* head, Node* node) { //Return sibling
   if (getParent(head, node) == NULL) {
     return NULL;
   }
@@ -286,11 +291,11 @@ Node* getSibling(Node* head, Node* node) {
   }
 }
 
-Node* getUncle(Node* head, Node* node) {
+Node* getUncle(Node* head, Node* node) { //Return uncle
   return getSibling(head, getParent(head, node));
 }
 
-Node* getGrand(Node* head, Node* node) {
+Node* getGrand(Node* head, Node* node) { //Return grandparent
   return getParent(head, getParent(head, node));
 }
 
@@ -339,7 +344,6 @@ void print(Node* head, int space){ //Print
 }
 
 Node* add(Node* head, Node* node) {
-  cout << "begin add" << endl;
   Node* root = head;
   addFix(head, node);
   fixColor(head, node);
@@ -351,9 +355,7 @@ Node* add(Node* head, Node* node) {
 }
 
 void addFix(Node* head, Node* node) {
-  cout << "Adding" << endl;
   if (head != NULL) {
-    cout << "Is not head" << endl;
     if (node->getValue() < head->getValue()) {
       if (head->getLeft() != NULL) {
         add(head->getLeft(), node);
