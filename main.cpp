@@ -18,6 +18,7 @@ void fixColor(Node* head, Node* node);
 Node* getParent(Node* head, Node* node);
 Node* getUncle(Node* head, Node* node);
 Node* getGrand(Node* head, Node* node);
+Node* getSibling(Node* head, Node* node);
 
 int main(){
   bool quit = false;
@@ -102,7 +103,9 @@ int main(){
       return 0;
     }
     else if (strcmp(input, "Test") == 0) {
-      cout << getParent(head, head->getLeft()) -> getValue() << endl;
+      if (getUncle(head, head->getLeft()->getLeft()->getLeft()) != NULL) {
+        cout << getUncle(head, head->getLeft()->getLeft()->getLeft()) -> getValue() << endl;
+      }
     }
   }
 }
@@ -171,13 +174,22 @@ void remove(Node* head, Node* first, int num) {
 void fixColor(Node* head, Node* node) {
   cout << "Fixing color" << endl;
   if (head == node) {
-    cout << "Is head, turning head black" << endl;
-    head->setColor(1);
+    cout << "Head is node" << endl;
+    return;
+  }
+  else if (getParent(head, node)->getColor() == 1) {
+    cout << "Parent is black (which is good)" << endl;
   }
   else if (getParent(head, node) != NULL && getUncle(head, node) != NULL) {
+    cout << "Has parent, has uncle" << endl;
     if (getParent(head, node)->getColor() == 0 && getUncle(head, node) ->getColor() == 0) {
+      cout << "Parent and Uncle Red" << endl;
+      cout << "Setting " << getParent(head, node) -> getValue() << " to black" << endl;
       getParent(head, node) -> setColor(1);
+      cout << "Setting " << getUncle(head, node) -> getValue() << " to black" << endl;
+      cout << getUncle(head, node) -> getValue() << endl;
       getUncle(head, node) -> setColor(1);
+      cout << "Setting " << getGrand(head, node) -> getValue() << " to black" << endl;
       getGrand(head, node) -> setColor(0);
       fixColor(head, getGrand(head, node));
     }
@@ -196,85 +208,46 @@ void fixColor(Node* head, Node* node) {
       }
     }
   }
+  else {
+    cout << "Ayaya" << endl;
+  }
 }
 
 Node* getParent(Node* head, Node* node) {
-  cout << "Getting parent" << endl;
   if (head->getLeft() == node || head->getRight() == node) {
-    cout << "Parent is found" << endl;
-    return node;
+    return head;
   }
   else {
     if (head->getLeft() != NULL) {
-      cout << "Parent search left" << endl;
       return getParent(head->getLeft(), node);
     }
     else if (head->getRight() != NULL) {
-      cout << "Parent search right" << endl;
       return getParent(head->getRight(), node);
     }
     else {
-      cout << "Parent not found" << endl;
       return NULL;
     }
+  }
+}
+
+Node* getSibling(Node* head, Node* node) {
+  if (getParent(head, node) == NULL) {
+    return NULL;
+  }
+  if (getParent(head, node) -> getLeft() == node) {
+    return getParent(head, node) -> getRight();
+  }
+  else {
+    return getParent(head, node) -> getLeft();
   }
 }
 
 Node* getUncle(Node* head, Node* node) {
-  cout << "Getting uncle" << endl;
-  if (head->getLeft() != NULL) {
-    if (head->getLeft()->getLeft() == node || head->getLeft()->getRight() == node) {
-      cout << "Uncle found right" << endl;
-      return head->getRight();
-    }
-  }
-  if (head->getRight() != NULL) {
-    if (head->getRight()->getLeft() == node || head->getRight()->getRight() == node) {
-      cout << "Uncle found left" << endl;
-      return head->getLeft();
-    }
-  }
-  else {
-    if (head->getRight() != NULL) {
-      cout << "Uncle search right" << endl;
-      return getUncle(head->getRight(), node);
-    }
-    else if (head->getLeft() != NULL) {
-      cout << "Uncle search left" << endl;
-      return getUncle(head->getLeft(), node);
-    }
-    else {
-      cout << "Uncle not found" << endl;
-      return NULL;
-    }
-  }
+  return getSibling(head, getParent(head, node));
 }
 
-
 Node* getGrand(Node* head, Node* node) {
-  if (head->getLeft()->getLeft() == node) {
-    return head;
-  }
-  else if (head->getLeft()->getRight() == node) {
-    return head;
-  }
-  else if (head->getRight()->getRight() == node) {
-    return head;
-  }
-  else if (head->getRight()->getLeft() == node) {
-    return head;
-  }
-  else {
-    if (head->getRight() != NULL) {
-      return getGrand(head->getRight(), node);
-    }
-    else if (head -> getLeft() != NULL) {
-      return getGrand(head->getLeft(), node);
-    }
-    else {
-      return NULL; 
-    }
-  }
+  return getParent(head, getParent(head, node));
 }
 
 Node* twoChild(Node* head) { //Goes all the way left until null
@@ -325,7 +298,7 @@ void add(Node* head, Node* parent, int value, int first) {
   int count = 0;
   if (first == 2) { //Set head
     parent -> setValue(value);
-    fixColor(head, head);
+    parent-> setColor(1);
   }
   else {
     if (value >  parent->getValue()) { //Going right
@@ -345,7 +318,7 @@ void add(Node* head, Node* parent, int value, int first) {
       else { // New node
         Node* newNode = new Node(value);
         parent->setLeft(newNode);
-        fixColor(head, newNode);
+        //fixColor(head, newNode);
       }
     }
   }
