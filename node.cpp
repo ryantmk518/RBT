@@ -10,6 +10,7 @@ Node::Node(int newvalue) { //Create node
   right = NULL;
   left = NULL;
   color = 0;
+  parent = NULL;
 }
 
 Node::~Node() { //Delete node

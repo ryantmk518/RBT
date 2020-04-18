@@ -254,11 +254,11 @@ void remove(Node* head, Node* first, int num) {
 
 void fixColor(Node* head, Node* node) {
   cout << "Fix color" << endl;
-  if (getParent(head, node) == NULL) {
+  if (node->getParent() == NULL) {
     cout << "Parent is null" << endl;
     Case1(head, node);
   }
-  else if (getParent(head, node) ->getColor() == 1) {
+  else if (node->getParent() ->getColor() == 1) {
     Case2(head, node);
   }
   else if (getUncle(head, node) != NULL && getUncle(head, node) -> getColor() == 0) {
@@ -352,11 +352,7 @@ Node* add(Node* head, Node* node) {
 
 void addFix(Node* head, Node* node) {
   cout << "Adding" << endl;
-  if (head == NULL){
-    cout << "Is head" << endl;
-    head = node;
-  }
-  else {
+  if (head != NULL) {
     cout << "Is not head" << endl;
     if (node->getValue() < head->getValue()) {
       if (head->getLeft() != NULL) {
@@ -378,7 +374,4 @@ void addFix(Node* head, Node* node) {
     }
   }
   node->setParent(head);
-  if (node->getParent() == NULL) {
-    cout << "OK" << endl;
-  }
 }
