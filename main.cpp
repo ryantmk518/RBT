@@ -9,24 +9,23 @@
 
 using namespace std;
 
-Node* add(Node* head, Node* node); //Initialize functions
+Node* add(Node* &head, Node* root, Node* node); //Initialize functions
 void print(Node* head, int space);
 void search(Node* head, int num);
-void remove(Node* head, Node* first, int num);
 Node* twoChild(Node* head);
-void fixColor(Node* head, Node* node);
+void fixColor(Node* &head, Node* node);
 Node* getParent(Node* head, Node* node);
 Node* getUncle(Node* head, Node* node);
 Node* getGrand(Node* head, Node* node);
 Node* getSibling(Node* head, Node* node);
-void Case1(Node* head, Node* node);
-void Case2(Node* head, Node* node);
-void Case3(Node* head, Node* node);
-void Case4(Node* head, Node* node);
-void rotateRight(Node* head, Node* node);
-void rotateLeft(Node* head, Node* node);
+void Case1(Node* &head, Node* node);
+void Case2(Node* &head, Node* node);
+void Case3(Node* &head, Node* node);
+void Case4(Node* &head, Node* node);
+void rotateRight(Node* node);
+void rotateLeft(Node* node);
 void addFix(Node* head, Node* node);
-void Case5(Node* head, Node* node);
+Node* fixHead (Node* node);
 
 int main(){
   bool quit = false;
@@ -47,18 +46,9 @@ int main(){
         token = strtok(NULL, " ");
         ++a;
       }
-      if (head == NULL) { //If tree does not exist
-        cout << "New tree" << endl;
-        for(int i = 0; i < a; i++) {
-          Node* newNode = new Node(array[i]);
-          head = add(head, newNode);
-        }
-      }
-      else { //If tree already exists
-        for(int i = 0; i < a; i++) {
-          Node* newNode = new Node(array[i]);
-          head = add(head, newNode);
-        }
+      for(int i = 0; i < a; i++) {
+        Node* newNode = new Node(array[i]);
+        head = add(head, head, newNode);
       }
       print(head, 0); //Print the tree
       cout << "\n";
@@ -83,12 +73,12 @@ int main(){
         split = strtok(NULL, " ");
         ++a;
       }
-      cout << "adding" << endl;
+      cout << a << endl;
       for(int i = 0; i < a; i++) {
+        cout << array[i] << endl;
         Node* newNode = new Node(array[i]);
-        head = add(head, newNode);
+        head = add(head, head, newNode);
       }
-      cout << "Done" << endl;
       print(head, 0);
       cout << "\n";
     }
@@ -114,152 +104,96 @@ int main(){
       return 0;
     }
     else if (strcmp(input, "Test") == 0) {
-      if (getUncle(head, head->getLeft()->getLeft()->getLeft()) != NULL) {
-        cout << getUncle(head, head->getLeft()->getLeft()->getLeft()) -> getValue() << endl;
-      }
+      
     }
   }
 }
 
-void rotateLeft(Node* head, Node* node) { //Rotate left for case 4
+void rotateLeft(Node* node) { //Rotate left for case 4
   Node* newNode = node->getRight();
+  Node* parent = node->getParent();
   node->setRight(newNode->getLeft());
   newNode->setLeft(node);
   node->setParent(newNode);
   if (node->getRight() != NULL) {
     node->getRight()->setParent(node);
   }
-  if (getParent(head, node) != NULL) {
-    if (getParent(head, node) -> getLeft() == node) {
-      getParent(head, node) ->setLeft(newNode);
+  if (node->getParent() != NULL) {
+    if (parent -> getLeft() == node) {
+      parent ->setLeft(newNode);
     }
-    else if (getParent(head, node) -> getRight() == node) {
-      getParent(head, node) ->setRight(newNode);
+    else if (node->getParent() -> getRight() == node) {
+      parent ->setRight(newNode);
     }
   }
-  newNode->setParent(getParent(head, node));
+  newNode->setParent(parent);
 }
 
-void rotateRight(Node* head, Node* node) { //Rotate tree right for case 4
+void rotateRight(Node* node) { //Rotate tree right for case 4
   Node* newNode = node->getLeft();
+  Node* parent = node->getParent();
   node->setLeft(newNode->getRight());
   newNode->setRight(node);
   node->setParent(newNode);
   if (node->getLeft() != NULL) {
     node->getLeft()->setParent(node);
   }
-  if (getParent(head, node) != NULL) {
-    if (getParent(head, node) -> getLeft() == node) {
-      getParent(head, node) ->setLeft(newNode);
+  if (parent != NULL) {
+    if (parent -> getLeft() == node) {
+      parent ->setLeft(newNode);
     }
-    else if (getParent(head, node) -> getRight() == node) {
-      getParent(head, node) ->setRight(newNode);
+    else if (node->getParent() -> getRight() == node) {
+      parent ->setRight(newNode);
     }
   }
-  newNode->setParent(getParent(head, node));
+  newNode->setParent(parent);
 }
 
 
-void Case1(Node* head, Node* node) {
+void Case1(Node* &head, Node* node) {
   node->setColor(1);
 }
 
-void Case2(Node* head, Node* node) {
+void Case2(Node* &head, Node* node) {
   return;
 }
 
-void Case3(Node* head, Node* node) {
+void Case3(Node* &head, Node* node) {
   getParent(head, node) ->setColor(1);
   getUncle(head, node) ->setColor(1);
   getGrand(head, node) ->setColor(0);
   fixColor(head, getGrand(head, node));
 }
 
-void Case4(Node* head, Node* node) {
-  if (getParent(head, node) -> getRight() == node && getGrand(head, node)->getRight() == getParent(head, node)) {
-    rotateLeft(head, getParent(head, node));
+void Case4(Node* &head, Node* node) {
+  Node* parent = node->getParent();
+  Node* grandparent = node->getParent()->getParent();
+  if (node == parent->getRight() && parent == grandparent->getLeft()) {
+    rotateLeft(parent);
     node = node->getLeft();
   }
-  else if (getParent(head, node) -> getLeft() == node && getGrand(head, node)->getLeft() == getParent(head, node)) {
-    rotateRight(head, getParent(head, node));
+  else if (node == parent->getLeft() && parent == grandparent->getRight()) {
+    rotateRight(parent);
     node = node->getRight();
   }
-  Case5(head, node);
-}
-
-void Case5(Node* head, Node* node) {
-  if (getParent(head, node) -> getLeft() == node) {
-    rotateRight(head, getGrand(head, node));
+  parent = node->getParent();
+  grandparent = node->getParent()->getParent();
+  if (node == parent->getLeft()){
+    rotateRight(grandparent);
   }
   else {
-    rotateLeft(head, getGrand(head, node));
+    rotateLeft(grandparent);
   }
-  getParent(head, node) ->setColor(1);
-  getGrand(head, node) -> setColor(0);
+  if (head == grandparent) {
+    head = parent;
+  }
+  parent->setColor(0);
+  grandparent->setColor(1);
 }
 
-void remove(Node* head, Node* first, int num) { //Not needed
-  if (head == NULL) { //If tree doesn't exist
-    return;
-  }
-  else if (head->getValue() < num) { //Go right
-    if (head->getRight() -> getValue() == num) { //If right is the int we want
-      if (head->getRight()->getRight() == NULL && head->getRight()->getLeft() == NULL) { //No child case
-        head->setRight(NULL);
-      }
-      else if (head->getRight()->getLeft() != NULL && head->getRight()->getRight() == NULL) { //One child case
-        int newValue = head->getRight()->getLeft()->getValue();
-        remove(first, first, newValue);
-        head->getRight()->setValue(newValue);
-      }
-      else if (head->getRight()->getRight() != NULL && head->getRight()->getLeft() == NULL) { //One child case
-        int newValue = head->getRight()->getRight()->getValue();
-        remove(first, first, newValue);
-        head->getRight()->setValue(newValue);
-      }
-      else if (head->getRight() -> getRight() != NULL && head->getRight()->getLeft() != NULL) { //Two child case
-        int newValue = twoChild(head->getRight()->getRight())->getValue();
-        remove(first, first, twoChild(head->getRight()->getRight())->getValue());
-        head->getRight()->setValue(newValue);
-      }
-    }
-    else {
-      remove(head->getRight(), first, num);
-    }
-  }
-  else if (head->getValue() > num) { //Go left
-    if (head->getLeft() -> getValue() == num) {
-      if (head->getLeft()->getRight() == NULL && head->getLeft()->getLeft() == NULL) { //No child case
-        head->setLeft(NULL);
-      }
-      else if (head->getLeft()->getLeft() != NULL && head->getLeft()->getRight() == NULL) { //One child case
-        int newValue = head->getLeft()->getLeft()->getValue();
-        remove(first, first, newValue);
-        head->getLeft()->setValue(newValue);
-      }
-      else if (head->getLeft()->getRight() != NULL && head->getLeft()->getLeft() == NULL) { //One child case
-        int newValue = head->getLeft()->getRight()->getValue();
-        remove(first, first, newValue);
-        head->getLeft()->setValue(newValue);
-      }
-      else if (head->getLeft() -> getRight() != NULL && head->getLeft()->getLeft() != NULL) { //Two child case
-        int newValue = twoChild(head->getLeft()->getRight())->getValue();
-        remove(first, first, twoChild(head->getLeft()->getRight())->getValue());
-        head->getLeft()->setValue(newValue);
-      }
-    }
-    else {
-      remove(head->getLeft(), first, num);
-    }
-  }
-  else if (head->getValue() == num) { //If the head is the delete num
-    int newValue = head->getRight()->getValue();
-    remove(first, first, newValue);
-    head->setValue(newValue);
-  }
-}
 
-void fixColor(Node* head, Node* node) {
+
+void fixColor(Node* &head, Node* node) {
   if (node->getParent() == NULL) { //If parent is null
     Case1(head, node);
   }
@@ -343,37 +277,47 @@ void print(Node* head, int space){ //Print
   print(head->getLeft(), space);
 }
 
-Node* add(Node* head, Node* node) {
-  Node* root = head;
+Node* add(Node* &head, Node* root, Node* node) {
   addFix(head, node);
   fixColor(head, node);
-  head = node;
-  while (getParent(root, head) != NULL) {
-    head = getParent(root, head);
+  return fixHead(node);
+}
+
+Node* fixHead(Node* node) {
+  if (node->getParent() == NULL) {
+    return node;
   }
-  return head;
+  else {
+    return fixHead(node->getParent());
+  }
 }
 
 void addFix(Node* head, Node* node) {
-  if (head != NULL) {
+  if (head != NULL) { //If there is already a tree
     if (node->getValue() < head->getValue()) {
       if (head->getLeft() != NULL) {
-        add(head->getLeft(), node);
+        addFix(head->getLeft(), node);
         return;
       }
       else {
+        node->setParent(head);
         head->setLeft(node);
       }
     }
     else {
       if (head->getRight() != NULL) {
-        add(head->getRight(), node);
+        addFix(head->getRight(), node);
         return;
       }
       else {
+        node->setParent(head);
         head->setRight(node);
       }
     }
   }
-  node->setParent(head);
+  else {
+    head = node;
+    head->setParent(NULL);
+    return;
+  }
 }
