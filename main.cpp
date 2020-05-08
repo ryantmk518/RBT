@@ -7,6 +7,7 @@
 
 //Ryan Thammakhoune Red Black Tree. Add integers to a binary tree. Assigns red or black to each node. The number of black nodes in each path is the same.
 
+//With help from Wikipedia page for Red Black Tree
 using namespace std;
 
 Node* add(Node* &head, Node* root, Node* node); //Initialize functions
@@ -26,6 +27,7 @@ void rotateRight(Node* node);
 void rotateLeft(Node* node);
 void addFix(Node* head, Node* node);
 Node* fixHead (Node* node);
+void remove(Node* head, int num);
 
 int main(){
   bool quit = false;
@@ -106,6 +108,48 @@ int main(){
     else if (strcmp(input, "Test") == 0) {
       
     }
+  }
+}
+
+void replace(Node* node, Node* child) {
+  child->parent = node->parent;
+  if (node == node->parent->getLeft()) {
+    node->parent->getLeft() = child;
+  }
+  else {
+    node->parent->getRight() = child;
+  }
+}
+
+void removeOne(Node* node) {
+  if (node->getLeft() != NULL) {
+    Node* child = node->getLeft();
+  }
+  else {
+    Node* child = node->getRight();
+  }
+}
+
+Node* remove(Node* head, int num) {
+  if (head == NULL) {
+    return NULL;
+  }
+  else if (head->getValue() == num) {
+    return head;
+  }
+  else{
+    if (head->getRight() != NULL) {
+      return remove(head->getRight(), num);
+    }
+    if (head->getLeft() != NULL) {
+      return remove(head->getLeft(), num);
+    }
+  }
+}
+
+void Rm1(Node* node) {
+  if (node->parent != NULL) {
+    Rm2(node);
   }
 }
 
