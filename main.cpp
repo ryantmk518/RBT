@@ -28,6 +28,10 @@ void rotateLeft(Node* node);
 void addFix(Node* head, Node* node);
 Node* fixHead (Node* node);
 void remove(Node* head, int num);
+void removeOne(Node* node);
+void replace(Node* node, Node* child);
+void Rm1(Node* node);
+void Rm2(Node* node);
 
 int main(){
   bool quit = false;
@@ -128,6 +132,15 @@ void removeOne(Node* node) {
   else {
     Node* child = node->getRight();
   }
+  replace(node, child);
+  if (node->getColor() == 1) {
+    if (child->getColor() == 0) {
+      child->setColor(1);
+    }
+    else {
+      Rm1(child);
+    }
+  }
 }
 
 Node* remove(Node* head, int num) {
@@ -150,6 +163,20 @@ Node* remove(Node* head, int num) {
 void Rm1(Node* node) {
   if (node->parent != NULL) {
     Rm2(node);
+  }
+}
+
+void Rm2(Node* node) {
+  Node* sibling = GetSibling(node);
+  if (sibling->getColor() == 0) {
+    node->parent->setColor(0);
+    sibling->setColor(1);
+    if (node == node->parent->getLeft()) {
+      RotateLeft(node->parent);
+    }
+    else {
+      RotateRight(node->parent);
+    }
   }
 }
 
