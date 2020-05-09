@@ -27,11 +27,15 @@ void rotateRight(Node* node);
 void rotateLeft(Node* node);
 void addFix(Node* head, Node* node);
 Node* fixHead (Node* node);
-void remove(Node* head, int num);
-void removeOne(Node* node);
+Node* remove(Node* head, int num);
+void removeOne(Node* head, Node* node);
 void replace(Node* node, Node* child);
-void Rm1(Node* node);
-void Rm2(Node* node);
+void Rm1(Node* head, Node* node);
+void Rm2(Node* head, Node* node);
+void Rm3(Node* head, Node* node);
+void Rm4(Node* head, Node* node);
+void Rm5(Node* head, Node* node);
+void Rm6(Node* head, Node* node);
 
 int main(){
   bool quit = false;
@@ -116,21 +120,22 @@ int main(){
 }
 
 void replace(Node* node, Node* child) {
-  child->parent = node->parent;
-  if (node == node->parent->getLeft()) {
-    node->parent->getLeft() = child;
+  child->setParent(node->getParent());
+  if (node == node->getParent()->getLeft()) {
+    node->getParent()->setLeft(child);
   }
   else {
-    node->parent->getRight() = child;
+    node->getParent()->setRight(child);
   }
 }
 
-void removeOne(Node* node) {
+void removeOne(Node* head, Node* node) {
+  Node* child = new Node(NULL);
   if (node->getLeft() != NULL) {
-    Node* child = node->getLeft();
+    child = node->getLeft();
   }
   else {
-    Node* child = node->getRight();
+    child = node->getRight();
   }
   replace(node, child);
   if (node->getColor() == 1) {
@@ -138,7 +143,7 @@ void removeOne(Node* node) {
       child->setColor(1);
     }
     else {
-      Rm1(child);
+      Rm1(head, child);
     }
   }
 }
@@ -160,23 +165,76 @@ Node* remove(Node* head, int num) {
   }
 }
 
-void Rm1(Node* node) {
-  if (node->parent != NULL) {
-    Rm2(node);
+void Rm1(Node* head, Node* node) {
+  if (node->getParent() != NULL) {
+    Rm2(head, node);
   }
 }
 
-void Rm2(Node* node) {
-  Node* sibling = GetSibling(node);
+void Rm2(Node* head, Node* node) {
+  Node* sibling = getSibling(head, node);
   if (sibling->getColor() == 0) {
-    node->parent->setColor(0);
+    node->getParent()->setColor(0);
     sibling->setColor(1);
-    if (node == node->parent->getLeft()) {
-      RotateLeft(node->parent);
+    if (node == node->getParent()->getLeft()) {
+      rotateLeft(node->getParent());
     }
     else {
-      RotateRight(node->parent);
+      rotateRight(node->getParent());
     }
+  }
+  Rm3(head, node);
+}
+
+void Rm3(Node* head, Node* node) {
+  Node* sibling = getSibling(head, node);
+  if (node->getParent()->getColor()==1 && sibling->getColor() == 1 && sibling->getLeft()->getColor() == 1 && sibling->getRight()->getColor() == 1) {
+    sibling->setColor(0);
+    Rm1(head, node->getParent());
+  }
+  else {
+    Rm4(head, node);
+  }
+}
+
+void Rm4(Node* head, Node* node) {
+  Node* sibling = getSibling(head, node);
+  if (node->getParent()->getColor()==0 && sibling->getColor() == 1 && sibling->getLeft()->getColor() == 1 && sibling->getRight()->getColor() == 1) {
+    sibling->setColor(0);
+    node->getParent()->setColor(1);
+  }
+  else {
+    Rm5(head, node);
+  }
+}
+
+void Rm5(Node* head, Node* node) {
+  Node* sibling = getSibling(head, node);
+  if (sibling->getColor() == 1) {
+    if (node == node->getParent()->getLeft() && sibling->getRight()->getColor() == 1 && sibling->getLeft()->getColor() == 0) {
+      sibling->setColor(0);
+      sibling->getLeft()->setColor(1);
+    }
+    else if (node == node->getParent()->getRight() && sibling->getLeft()->getColor()==1 && sibling->getRight()->getColor() == 0) {
+      sibling -> setColor(0);
+      sibling->getRight()->setColor(1);
+      rotateLeft(sibling);
+    }
+  }
+  Rm6(head, node);
+}
+
+void Rm6 (Node* head, Node* node) {
+  Node* sibling = getSibling(head, node);
+  sibling->setColor(node->getParent()->getColor());
+  node->getParent()->setColor(1);
+  if (node == node->getParent()->getLeft()) {
+    sibling->getRight()->setColor(1);
+    rotateLeft(node->getParent());
+  }
+  else {
+    sibling->getLeft()->setColor(1);
+    rotateRight(node->getParent());
   }
 }
 
@@ -186,14 +244,19 @@ void rotateLeft(Node* node) { //Rotate left for case 4
   node->setRight(newNode->getLeft());
   newNode->setLeft(node);
   node->setParent(newNode);
+  cout << "All set" << endl;
   if (node->getRight() != NULL) {
+    cout << "right is not null" << endl;
     node->getRight()->setParent(node);
   }
-  if (node->getParent() != NULL) {
+  if (parent != NULL) {
+    cout << "Parent is not null" << endl;
     if (parent -> getLeft() == node) {
+      cout << "is left" << endl;
       parent ->setLeft(newNode);
     }
-    else if (node->getParent() -> getRight() == node) {
+    else if (parent -> getRight() == node) {
+      cout << "is on right" << endl;
       parent ->setRight(newNode);
     }
   }
@@ -239,21 +302,30 @@ void Case3(Node* &head, Node* node) {
 void Case4(Node* &head, Node* node) {
   Node* parent = node->getParent();
   Node* grandparent = node->getParent()->getParent();
+  cout << "Set vars" << endl;
   if (node == parent->getRight() && parent == grandparent->getLeft()) {
+    cout << "Rotating Left" << endl;
     rotateLeft(parent);
+    cout << "Rotated left" << endl;
     node = node->getLeft();
   }
   else if (node == parent->getLeft() && parent == grandparent->getRight()) {
+    cout << "Rotating Right" << endl;
     rotateRight(parent);
+    cout << "Rotated right" << endl;
     node = node->getRight();
   }
   parent = node->getParent();
   grandparent = node->getParent()->getParent();
   if (node == parent->getLeft()){
+    cout << "Rotating Right" << endl;
     rotateRight(grandparent);
+    cout << "Rotated right" << endl;
   }
   else {
+    cout << "Rotating Left" << endl;
     rotateLeft(grandparent);
+    cout << "Rotated left" << endl;
   }
   if (head == grandparent) {
     head = parent;
@@ -277,6 +349,7 @@ void fixColor(Node* &head, Node* node) {
   else { //All other cases
     Case4(head, node);
   }
+  cout << "Color fixed" << endl;
 }
 
 
@@ -366,6 +439,7 @@ Node* fixHead(Node* node) {
 void addFix(Node* head, Node* node) {
   if (head != NULL) { //If there is already a tree
     if (node->getValue() < head->getValue()) {
+      cout << "Go left" << endl;
       if (head->getLeft() != NULL) {
         addFix(head->getLeft(), node);
         return;
@@ -376,6 +450,7 @@ void addFix(Node* head, Node* node) {
       }
     }
     else {
+      cout << "Go right" << endl;
       if (head->getRight() != NULL) {
         addFix(head->getRight(), node);
         return;
@@ -383,6 +458,7 @@ void addFix(Node* head, Node* node) {
       else {
         node->setParent(head);
         head->setRight(node);
+        cout << "Set right" << endl;
       }
     }
   }
