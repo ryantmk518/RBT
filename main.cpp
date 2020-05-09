@@ -126,13 +126,13 @@ int main(){
   }
 }
 
-int noNull(Node* head, Node* node) {
+int noNull(Node* head, Node* node) { //No null leaves
   int newHead = goRight(node->getLeft())->getValue();
   deletion(head, goRight(node->getLeft()));
   return newHead;
 }
 
-Node* goRight(Node* node) {
+Node* goRight(Node* node) { //Nearest node
   if (node->getRight() == NULL) {
     return node;
   }
@@ -143,7 +143,6 @@ Node* goRight(Node* node) {
 
 int deletion(Node* head, Node* node) {
   if (node -> getLeft() == NULL && node -> getRight() == NULL) {
-    cout << "Remove two" << endl;
     removeTwo(head, node);
     return head->getValue();
   }
@@ -154,29 +153,23 @@ int deletion(Node* head, Node* node) {
     removeOne(head, node);
     return head->getValue();
   }
-  cout << "Removed" << endl;
 }
 
 void removeTwo(Node* head, Node* node) { //If there is two null leaves
   if (node->getParent()->getRight() == node) {
-    cout << "Is right" << endl;
     node->getParent()->setRight(NULL);
   }
   else {
-    cout << "Is left" << endl;
     node->getParent()->setLeft(NULL);
   }
 }
 
 void replace(Node* node, Node* child) {
   child->setParent(node->getParent());
-  cout << "initial" << endl;
   if (node == node->getParent()->getLeft()) {
-    cout << "Is left" << endl;
     node->getParent()->setLeft(child);
   }
   else {
-    cout << "Is right" << endl;
     node->getParent()->setRight(child);
   }
 }
@@ -184,9 +177,7 @@ void replace(Node* node, Node* child) {
 void removeOne(Node* head, Node* node) {//One null leaf
   Node* child = (node->getRight() == NULL) ? node->getLeft() : node->getRight();
   assert(child);
-  cout << "Bruh moment surpassed" << endl;
   replace(node, child);
-  cout << "Done" << endl;
   if (node->getColor() == 1) {
     if (child->getColor() == 0) {
       child->setColor(1);
