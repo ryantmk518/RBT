@@ -38,6 +38,9 @@ void Rm3(Node* head, Node* node);
 void Rm4(Node* head, Node* node);
 void Rm5(Node* head, Node* node);
 void Rm6(Node* head, Node* node);
+int deletion(Node* head, Node* node);
+int noNull(Node* head, Node* node);
+Node* goRight(Node* node);
 
 int main(){
   bool quit = false;
@@ -109,13 +112,7 @@ int main(){
       int num = atoi(input);
       Node* newNode = remove(head, num);
       cout << "Removing " << num << endl;
-      if (newNode -> getLeft() == NULL && newNode -> getRight() == NULL) {
-        cout << "Remove two" << endl;
-        removeTwo(head, remove(head, num));
-      }
-      else {
-        removeOne(head, remove(head, num));
-      }
+      head->setValue(deletion(head, newNode));
       cout << "Removed" << endl;
       print(head, 0);
     }
@@ -129,7 +126,38 @@ int main(){
   }
 }
 
-void removeTwo(Node* head, Node* node) {
+int noNull(Node* head, Node* node) {
+  int newHead = goRight(node->getLeft())->getValue();
+  deletion(head, goRight(node->getLeft()));
+  return newHead;
+}
+
+Node* goRight(Node* node) {
+  if (node->getRight() == NULL) {
+    return node;
+  }
+  else {
+    return goRight(node->getRight());
+  }
+}
+
+int deletion(Node* head, Node* node) {
+  if (node -> getLeft() == NULL && node -> getRight() == NULL) {
+    cout << "Remove two" << endl;
+    removeTwo(head, node);
+    return head->getValue();
+  }
+  else if (node -> getLeft() != NULL && node->getRight() != NULL){
+    return noNull(head, node);
+  }
+  else {
+    removeOne(head, node);
+    return head->getValue();
+  }
+  cout << "Removed" << endl;
+}
+
+void removeTwo(Node* head, Node* node) { //If there is two null leaves
   if (node->getParent()->getRight() == node) {
     cout << "Is right" << endl;
     node->getParent()->setRight(NULL);
@@ -153,7 +181,7 @@ void replace(Node* node, Node* child) {
   }
 }
 
-void removeOne(Node* head, Node* node) {
+void removeOne(Node* head, Node* node) {//One null leaf
   Node* child = (node->getRight() == NULL) ? node->getLeft() : node->getRight();
   assert(child);
   cout << "Bruh moment surpassed" << endl;
@@ -170,7 +198,7 @@ void removeOne(Node* head, Node* node) {
   free(node);
 }
 
-Node* remove(Node* head, int num) {
+Node* remove(Node* head, int num) { //Search for the remove node
   if (head == NULL) {
     return NULL;
   }
