@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include "stdlib.h"
+#include "assert.h"
 
 //Ryan Thammakhoune Red Black Tree. Add integers to a binary tree. Assigns red or black to each node. The number of black nodes in each path is the same.
 
@@ -29,6 +30,7 @@ void addFix(Node* head, Node* node);
 Node* fixHead (Node* node);
 Node* remove(Node* head, int num);
 void removeOne(Node* head, Node* node);
+void removeTwo(Node* head, Node* node);
 void replace(Node* node, Node* child);
 void Rm1(Node* head, Node* node);
 void Rm2(Node* head, Node* node);
@@ -41,7 +43,7 @@ int main(){
   bool quit = false;
   Node* head = NULL; //Head node
   while (quit == false) {
-    cout << "Enter Console, File, or Quit" << endl;
+    cout << "Enter Console, File, Remove, or Quit" << endl;
     char input[99];
     cin.getline(input, 99);
     if (strcmp(input, "Console") == 0) { //Enter through console
@@ -99,16 +101,24 @@ int main(){
       int num = atoi(input); //Gets num
       search(head, num);
     }
-    /*
     else if (strcmp(input, "Remove") == 0) { //Remove
       char input[99];
       cout << "Enter integer to remove" << endl;
       cin.getline(input, 99);
       cout << "\n" << endl;
       int num = atoi(input);
-      remove(head, head, num);
+      Node* newNode = remove(head, num);
+      cout << "Removing " << num << endl;
+      if (newNode -> getLeft() == NULL && newNode -> getRight() == NULL) {
+        cout << "Remove two" << endl;
+        removeTwo(head, remove(head, num));
+      }
+      else {
+        removeOne(head, remove(head, num));
+      }
+      cout << "Removed" << endl;
       print(head, 0);
-      }*/
+    }
     else if (strcmp(input, "Quit") == 0) { //Quit
       quit = true;
       return 0;
@@ -119,25 +129,36 @@ int main(){
   }
 }
 
+void removeTwo(Node* head, Node* node) {
+  if (node->getParent()->getRight() == node) {
+    cout << "Is right" << endl;
+    node->getParent()->setRight(NULL);
+  }
+  else {
+    cout << "Is left" << endl;
+    node->getParent()->setLeft(NULL);
+  }
+}
+
 void replace(Node* node, Node* child) {
   child->setParent(node->getParent());
+  cout << "initial" << endl;
   if (node == node->getParent()->getLeft()) {
+    cout << "Is left" << endl;
     node->getParent()->setLeft(child);
   }
   else {
+    cout << "Is right" << endl;
     node->getParent()->setRight(child);
   }
 }
 
 void removeOne(Node* head, Node* node) {
-  Node* child = new Node(NULL);
-  if (node->getLeft() != NULL) {
-    child = node->getLeft();
-  }
-  else {
-    child = node->getRight();
-  }
+  Node* child = (node->getRight() == NULL) ? node->getLeft() : node->getRight();
+  assert(child);
+  cout << "Bruh moment surpassed" << endl;
   replace(node, child);
+  cout << "Done" << endl;
   if (node->getColor() == 1) {
     if (child->getColor() == 0) {
       child->setColor(1);
@@ -146,6 +167,7 @@ void removeOne(Node* head, Node* node) {
       Rm1(head, child);
     }
   }
+  free(node);
 }
 
 Node* remove(Node* head, int num) {
@@ -153,13 +175,14 @@ Node* remove(Node* head, int num) {
     return NULL;
   }
   else if (head->getValue() == num) {
+    cout << head->getValue() << endl;
     return head;
   }
   else{
-    if (head->getRight() != NULL) {
+    if (head->getRight() != NULL && num > head->getValue()) {
       return remove(head->getRight(), num);
     }
-    if (head->getLeft() != NULL) {
+    else if (head->getLeft() != NULL && num < head->getValue()) {
       return remove(head->getLeft(), num);
     }
   }
@@ -244,19 +267,14 @@ void rotateLeft(Node* node) { //Rotate left for case 4
   node->setRight(newNode->getLeft());
   newNode->setLeft(node);
   node->setParent(newNode);
-  cout << "All set" << endl;
   if (node->getRight() != NULL) {
-    cout << "right is not null" << endl;
     node->getRight()->setParent(node);
   }
   if (parent != NULL) {
-    cout << "Parent is not null" << endl;
     if (parent -> getLeft() == node) {
-      cout << "is left" << endl;
       parent ->setLeft(newNode);
     }
     else if (parent -> getRight() == node) {
-      cout << "is on right" << endl;
       parent ->setRight(newNode);
     }
   }
@@ -302,30 +320,21 @@ void Case3(Node* &head, Node* node) {
 void Case4(Node* &head, Node* node) {
   Node* parent = node->getParent();
   Node* grandparent = node->getParent()->getParent();
-  cout << "Set vars" << endl;
   if (node == parent->getRight() && parent == grandparent->getLeft()) {
-    cout << "Rotating Left" << endl;
     rotateLeft(parent);
-    cout << "Rotated left" << endl;
     node = node->getLeft();
   }
   else if (node == parent->getLeft() && parent == grandparent->getRight()) {
-    cout << "Rotating Right" << endl;
     rotateRight(parent);
-    cout << "Rotated right" << endl;
     node = node->getRight();
   }
   parent = node->getParent();
   grandparent = node->getParent()->getParent();
   if (node == parent->getLeft()){
-    cout << "Rotating Right" << endl;
     rotateRight(grandparent);
-    cout << "Rotated right" << endl;
   }
   else {
-    cout << "Rotating Left" << endl;
     rotateLeft(grandparent);
-    cout << "Rotated left" << endl;
   }
   if (head == grandparent) {
     head = parent;
@@ -349,7 +358,6 @@ void fixColor(Node* &head, Node* node) {
   else { //All other cases
     Case4(head, node);
   }
-  cout << "Color fixed" << endl;
 }
 
 
@@ -439,7 +447,6 @@ Node* fixHead(Node* node) {
 void addFix(Node* head, Node* node) {
   if (head != NULL) { //If there is already a tree
     if (node->getValue() < head->getValue()) {
-      cout << "Go left" << endl;
       if (head->getLeft() != NULL) {
         addFix(head->getLeft(), node);
         return;
@@ -450,7 +457,6 @@ void addFix(Node* head, Node* node) {
       }
     }
     else {
-      cout << "Go right" << endl;
       if (head->getRight() != NULL) {
         addFix(head->getRight(), node);
         return;
@@ -458,7 +464,6 @@ void addFix(Node* head, Node* node) {
       else {
         node->setParent(head);
         head->setRight(node);
-        cout << "Set right" << endl;
       }
     }
   }
