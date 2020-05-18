@@ -38,7 +38,7 @@ void Rm3(Node* head, Node* node);
 void Rm4(Node* head, Node* node);
 void Rm5(Node* head, Node* node);
 void Rm6(Node* head, Node* node);
-int deletion(Node* head, Node* node);
+void deletion(Node* head, Node* node);
 int noNull(Node* head, Node* node);
 Node* goRight(Node* node);
 
@@ -112,16 +112,13 @@ int main(){
       int num = atoi(input);
       Node* newNode = remove(head, num);
       cout << "Removing " << num << endl;
-      head->setValue(deletion(head, newNode));
+      deletion(head, newNode);
       cout << "Removed" << endl;
       print(head, 0);
     }
     else if (strcmp(input, "Quit") == 0) { //Quit
       quit = true;
       return 0;
-    }
-    else if (strcmp(input, "Test") == 0) {
-      
     }
   }
 }
@@ -141,17 +138,15 @@ Node* goRight(Node* node) { //Nearest node
   }
 }
 
-int deletion(Node* head, Node* node) {
+void deletion(Node* head, Node* node) {
   if (node -> getLeft() == NULL && node -> getRight() == NULL) {
     removeTwo(head, node);
-    return head->getValue();
   }
   else if (node -> getLeft() != NULL && node->getRight() != NULL){
-    return noNull(head, node);
+    node->setValue(noNull(head, node));
   }
   else {
     removeOne(head, node);
-    return head->getValue();
   }
 }
 
@@ -322,14 +317,17 @@ void rotateRight(Node* node) { //Rotate tree right for case 4
 
 
 void Case1(Node* &head, Node* node) {
+  cout << "Case 1" << endl;
   node->setColor(1);
 }
 
 void Case2(Node* &head, Node* node) {
+  cout << "Case 2" << endl;
   return;
 }
 
 void Case3(Node* &head, Node* node) {
+  cout << "Case 3" << endl;
   getParent(head, node) ->setColor(1);
   getUncle(head, node) ->setColor(1);
   getGrand(head, node) ->setColor(0);
@@ -337,6 +335,7 @@ void Case3(Node* &head, Node* node) {
 }
 
 void Case4(Node* &head, Node* node) {
+  cout << "Case 4" << endl;
   Node* parent = node->getParent();
   Node* grandparent = node->getParent()->getParent();
   if (node == parent->getRight() && parent == grandparent->getLeft()) {
@@ -347,8 +346,6 @@ void Case4(Node* &head, Node* node) {
     rotateRight(parent);
     node = node->getRight();
   }
-  parent = node->getParent();
-  grandparent = node->getParent()->getParent();
   if (node == parent->getLeft()){
     rotateRight(grandparent);
   }
@@ -358,8 +355,8 @@ void Case4(Node* &head, Node* node) {
   if (head == grandparent) {
     head = parent;
   }
-  parent->setColor(0);
-  grandparent->setColor(1);
+  parent->setColor(1);
+  grandparent->setColor(0);
 }
 
 
