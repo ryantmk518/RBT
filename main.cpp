@@ -46,7 +46,7 @@ int main(){
   bool quit = false;
   Node* head = NULL; //Head node
   while (quit == false) {
-    cout << "Enter Console, File, Remove, or Quit" << endl;
+    cout << "Enter Console, File, Remove, Search, or Quit" << endl;
     char input[99];
     cin.getline(input, 99);
     if (strcmp(input, "Console") == 0) { //Enter through console
@@ -145,6 +145,7 @@ void deletion(Node* head, Node* node) {
   else if (node -> getLeft() != NULL && node->getRight() != NULL){
     node->setValue(noNull(head, node));
   }
+
   else {
     removeOne(head, node);
   }
